@@ -4,6 +4,7 @@ div.container
 </template>
 
 <script lang="ts">
+import '@/assets/scss/reset.scss'
 import { defineComponent } from 'vue'
 
 export default defineComponent({
@@ -18,5 +19,11 @@ export default defineComponent({
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+
+.container {
+  display: flex;
+  align-items: flex-start;
+  height: 100vh;
 }
 </style>

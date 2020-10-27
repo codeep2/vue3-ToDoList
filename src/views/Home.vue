@@ -1,5 +1,5 @@
 <template lang="pug">
-nav
+div.sidebar
   TheSideBar
 main
 </template>>
@@ -15,3 +15,16 @@ export default defineComponent({
   }
 })
 </script>
+
+<style lang="scss" scoped>
+  .sidebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    background-color: #084a46;
+    width: 240px;
+    height: 100%;
+    padding: 20px 0 50px;
+  }
+</style>
