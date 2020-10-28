@@ -1,7 +1,8 @@
 <template lang="pug">
 div.sidebar
   TheSideBar
-main
+div.main
+  router-view
 </template>>
 
 <script lang="ts">

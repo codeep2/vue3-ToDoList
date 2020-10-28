@@ -1,14 +1,18 @@
 <template lang="pug">
 div.container
-  router-view
+  Home
 </template>
 
 <script lang="ts">
 import '@/assets/scss/reset.scss'
 import { defineComponent } from 'vue'
+import Home from '@/views/Home.vue'
 
 export default defineComponent({
-  name: 'App'
+  name: 'App',
+  components: {
+    Home
+  }
 })
 </script>>
 

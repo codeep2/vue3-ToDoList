@@ -6,9 +6,13 @@ div.sidebar__wrap
   div.sidebar__function-lists
     ul.functions
       li.function(
-        v-for="fun in functions"
-        :key="fun"
-      ) {{ fun }}
+        v-for="(fun, index) in functions"
+        :key="routePath(fun)"
+      )
+        router-link(
+          :to="routePath(fun)"
+          :class="{ active: $route.path === routePath(fun)}"
+        ) {{ fun }}
   div.sidebar__configure
     p setting
 </template>
@@ -18,15 +22,23 @@ import { defineComponent, ref } from 'vue'
 
 export default defineComponent({
   name: 'TheSideBar',
+
+  setup () {
+    const functions = ref(['Schedule', 'To Do List', 'Statistics'])
+    return {
+      functions
+    }
+  },
+
   data () {
     return {
       userName: 'Codeep'
     }
   },
-  setup () {
-    const functions = ref(['Schedule', 'To Do List', 'Statistics'])
-    return {
-      functions
+
+  methods: {
+    routePath (path: string): string {
+      return '/' + path.replaceAll(' ', '').toLowerCase()
     }
   }
 })
@@ -56,13 +68,14 @@ export default defineComponent({
   &__function-lists {
     margin-bottom: 200px;
     .function {
-      color: #a3afa7;
-      margin: 20px 0;
+      margin: 30px 0;
       font-size: 24px;
       &:hover {
         cursor: pointer;
       }
-      > span {
+      > a {
+        color: #a3afa7;
+        text-decoration: none;
         &.active {
           color: #f7f7f7;
         }
