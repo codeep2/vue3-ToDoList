@@ -2,17 +2,21 @@
 div.sidebar
   TheSideBar
 div.main
+  div.header
+    TheHeader
   router-view
 </template>>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import TheSideBar from '@/components/TheSidebar.vue'
+import TheHeader from '@/components/TheHeader.vue'
 
 export default defineComponent({
   name: 'Home',
   components: {
-    TheSideBar
+    TheSideBar,
+    TheHeader
   }
 })
 </script>
@@ -27,5 +31,12 @@ export default defineComponent({
     width: 240px;
     height: 100%;
     padding: 20px 0 50px;
+  }
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #f4f4f4;
   }
 </style>
