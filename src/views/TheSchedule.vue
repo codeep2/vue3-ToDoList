@@ -49,10 +49,9 @@ export default defineComponent({
       // 先得出这个月1号是周几（firstDaysWeek）
       // 目的是为了算出日历开始日期
       const { year, month } = date
-      const firstDaysWeek = new Date(year, month, 1).getDay()
+      const firstDaysWeek = new Date(year, month, 1).getDay() || 7
       const now = new Date()
       const days: DayItem[] = []
-
       for (let i = 0; i < 42; i++) {
         const maxDay = new Date(year, month + 1, 0).getDate()
 
@@ -169,6 +168,14 @@ export default defineComponent({
             .day {
               display: flex;
               justify-content: space-between;
+              .gregorian {
+                font-size: 17px;
+              }
+              .lunar {
+                width: fit-content;
+                white-space: nowrap;
+                color: #6d4f44;
+              }
             }
           }
           &:first-child {

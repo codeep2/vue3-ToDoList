@@ -23,6 +23,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
   .sidebar {
+    flex: 0 0 240px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -39,5 +40,8 @@ export default defineComponent({
     height: 100%;
     padding: 50px;
     background-color: #f4f4f4;
+    .header {
+      font-size: 20px;
+    }
   }
 </style>
