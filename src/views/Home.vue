@@ -37,6 +37,7 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     height: 100%;
+    padding: 50px;
     background-color: #f4f4f4;
   }
 </style>

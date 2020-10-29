@@ -5,6 +5,10 @@ import Statistics from '../views/TheStatistics.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
+    path: '/',
+    redirect: '/schedule'
+  },
+  {
     path: '/schedule',
     name: 'schedule',
     component: Schedule
