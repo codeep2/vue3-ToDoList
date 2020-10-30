@@ -14,7 +14,7 @@ const routes: Array<RouteRecordRaw> = [
     component: Schedule
   },
   {
-    path: '/todolist',
+    path: '/todolist/:date',
     name: 'todolist',
     component: ToDoList
   },

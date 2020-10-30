@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 <template lang="pug">
 div.schedule
   div.schedule__date
     div.pre(@click="switchMonth('back')") &lt
-    span.date {{ `${date.year}.${date.month + 1}` }}
+    span.date {{ `${currentDay.year}.${currentDay.month + 1}` }}
     div.next(@click="switchMonth('forward')") &gt
   table.schedule__calendar
     thead
@@ -13,7 +12,10 @@ div.schedule
     tbody
       tr(v-for="i in 6" :key="i")
         template(v-for="j in 7" :key="j")
-          td(:class="tdStyle(i, j)")
+          td(
+            :class="tdStyle(i, j)"
+            @dblclick="jumpTodo(i, j)"
+          )
             div.calendar_day
               div.day
                 span.gregorian {{ getCalendarDay[(i - 1) * 7 + (j - 1)].day }}
@@ -31,6 +33,8 @@ interface Date {
 }
 
 interface DayItem {
+  year: number;
+  month: number;
   day: number;
   iscurrent: boolean;
   istoday: boolean;
@@ -39,33 +43,45 @@ interface DayItem {
 
 export default defineComponent({
   setup () {
-    const date = reactive({
-      year: new Date().getFullYear(),
-      month: new Date().getMonth(),
-      day: new Date().getDate()
+    const date = new Date()
+    const currentDay = reactive({
+      year: date.getFullYear(),
+      month: date.getMonth(),
+      day: date.getDate()
     }) as Date
 
     const getCalendarDay = computed(() => {
       // 先得出这个月1号是周几（firstDaysWeek）
       // 目的是为了算出日历开始日期
-      const { year, month } = date
+      const { year, month } = currentDay
       const firstDaysWeek = new Date(year, month, 1).getDay() || 7
       const now = new Date()
       const days: DayItem[] = []
       for (let i = 0; i < 42; i++) {
+        // 当月天数
         const maxDay = new Date(year, month + 1, 0).getDate()
+        const dayItem = {} as DayItem
 
         const day = new Date(year, month, -firstDaysWeek + i + 2).getDate()
-        const iscurrent = !((i < firstDaysWeek - 1) || (i - firstDaysWeek + 2 > maxDay))
-        const istoday = day === now.getDate() &&
+        if (i < firstDaysWeek - 1) {
+          dayItem.month = month
+          dayItem.lunar = Lunar.toLunar(year, month, day)
+          dayItem.iscurrent = false
+        } else if (i - firstDaysWeek + 2 > maxDay) {
+          dayItem.month = month + 2
+          dayItem.lunar = Lunar.toLunar(year, month + 2, day)
+          dayItem.iscurrent = false
+        } else {
+          dayItem.month = month + 1
+          dayItem.lunar = Lunar.toLunar(year, month + 1, day)
+          dayItem.iscurrent = true
+        }
+        const istoday = dayItem.iscurrent &&
+          day === now.getDate() &&
           month === now.getMonth() &&
           year === now.getFullYear()
-        const lunar = i < firstDaysWeek - 1
-          ? Lunar.toLunar(year, month, day)
-          : (i - firstDaysWeek + 2) > maxDay
-            ? Lunar.toLunar(year, month + 2, day)
-            : Lunar.toLunar(year, month + 1, day)
-        days.push({ day, iscurrent, istoday, lunar })
+
+        days.push(Object.assign(dayItem, { year, day, istoday }))
       }
       return days
     })
@@ -88,15 +104,16 @@ export default defineComponent({
 
     const switchMonth = (type: string) => {
       if (type === 'back') {
-        date.month -= 1
+        currentDay.month -= 1
       }
       if (type === 'forward') {
-        date.month += 1
+        currentDay.month += 1
       }
     }
 
     return {
       date,
+      currentDay,
       tdStyle,
       getLunar,
       switchMonth,
@@ -107,6 +124,16 @@ export default defineComponent({
   data () {
     return {
       weeks: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+    }
+  },
+
+  methods: {
+    jumpTodo (i: number, j: number) {
+      const dayItem = this.getCalendarDay[(i - 1) * 7 + (j - 1)]
+      let strday = dayItem.day.toString()
+      if (strday.length === 1) { strday = '0' + strday }
+      const strDate = dayItem.year.toString() + dayItem.month + strday
+      this.$router.push({ name: 'todolist', params: { date: strDate } })
     }
   }
 })

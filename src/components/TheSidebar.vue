@@ -38,7 +38,16 @@ export default defineComponent({
 
   methods: {
     routePath (path: string): string {
-      return '/' + path.replaceAll(' ', '').toLowerCase()
+      const lowerPath = path.replaceAll(' ', '').toLowerCase()
+      if (lowerPath === 'todolist') {
+        const day = new Date().toLocaleDateString('cn', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        }).replaceAll('/', '')
+        return '/' + lowerPath + '/' + day
+      }
+      return '/' + lowerPath
     }
   }
 })
