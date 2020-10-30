@@ -3,7 +3,10 @@ div.sidebar
   TheSideBar
 div.main
   div.header
-    TheHeader
+    TheHeader(:headerTitle="$route.name")
+      div.date(
+        v-if="$route.name === 'todolist'"
+      ) {{ date }}
   router-view
 </template>>
 
@@ -17,11 +20,23 @@ export default defineComponent({
   components: {
     TheSideBar,
     TheHeader
+  },
+  computed: {
+    date () {
+      const date = this.$route.params.date
+      const weeks = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sta']
+      const year = parseInt(date.slice(0, 4) as string)
+      const month = parseInt(date.slice(4, 6) as string)
+      const day = parseInt(date.slice(-2) as string)
+      const week = new Date(year, month - 1, day).getDay()
+
+      return `${year}.${month}.${day}.${weeks[week]}`
+    }
   }
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
   .sidebar {
     flex: 0 0 240px;
     display: flex;
@@ -41,7 +56,13 @@ export default defineComponent({
     padding: 50px;
     background-color: #f4f4f4;
     .header {
-      font-size: 20px;
+      h1 {
+        font-size: 32px;
+      }
+      .date {
+        font-size: 16px;
+        font-weight: bold;
+      }
     }
   }
 </style>
