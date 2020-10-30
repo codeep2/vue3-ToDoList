@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-10-27 09:50:44
  * @Author: Codeep2
- * @LastEditTime: 2020-10-27 10:10:17
+ * @LastEditTime: 2020-10-30 16:42:25
  * @LastEditors: Codeep2
  * @Description: webpack 配置文件
  */
@@ -10,7 +10,7 @@
 const path = require('path')
 
 module.exports = {
-  publicPath: './',
+  publicPath: '/',
   outputDir: 'dist',
   configureWebpack: {
     resolve: {
@@ -47,7 +47,7 @@ module.exports = {
   devServer: {
     open: true,
     port: '4000',
-    contentBase: 'dist',
+    // contentBase: 'dist',
     hot: true,
     overlay: true
   }
