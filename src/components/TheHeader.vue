@@ -24,6 +24,5 @@ export default defineComponent({
     padding: 0 8px 10px 10px;
     text-transform: capitalize;
     border-bottom: solid 3px #878787;
-
   }
 </style>

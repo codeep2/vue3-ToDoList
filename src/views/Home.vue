@@ -23,11 +23,12 @@ export default defineComponent({
   },
   computed: {
     date () {
-      const date = this.$route.params.date
+      const date = this.$route.params.date as string
       const weeks = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sta']
-      const year = parseInt(date.slice(0, 4) as string)
-      const month = parseInt(date.slice(4, 6) as string)
-      const day = parseInt(date.slice(-2) as string)
+
+      const year = parseInt(date.slice(0, 4))
+      const month = parseInt(date.slice(4, 6))
+      const day = parseInt(date.slice(-2))
       const week = new Date(year, month - 1, day).getDay()
 
       return `${year}.${month}.${day}.${weeks[week]}`

@@ -2,6 +2,7 @@
 div.todolist
   toDoListCard(
     v-for="title in titles"
+    :title="title"
   )
 </template>
 

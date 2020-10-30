@@ -1,7 +1,8 @@
 <template lang="pug">
 div.todolist__card
   div.todolist__card-header
-    TheHeader
+    TheHeader(:headerTitle="title")
+      SvgIcon(iconName="ellipsis")
   div.todolist__card-body
     ul.todos
       template(v-for="todo in todos")
@@ -13,10 +14,19 @@ div.todolist__card
 <script lang="ts">
 import { defineComponent } from 'vue'
 import TheHeader from '@/components/TheHeader.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
+
+import '@/assets/icon/ellipsis.svg'
 
 export default defineComponent({
   components: {
+    SvgIcon,
     TheHeader
+  },
+  props: {
+    title: {
+      type: String
+    }
   },
   data () {
     return {
@@ -38,27 +48,35 @@ export default defineComponent({
       padding: 20px;
       margin: 0 25px;
       border-radius: 20px;
+      box-shadow: 4px 6px 9px#6b8a6b;
       background: #ffffff;
       &-header {
         font-size: 14px;
+        svg {
+          cursor: pointer;
+          width: 48px;
+          height: 24px;
+        }
       }
       &-body {
         .todos {
           .todo {
+            height: 50px;
             margin: 10px 0;
             padding: 0 10px;
-            border-radius: 27px;
-            border: 1px solid transparent;
+            border-radius: 14px;
+            border: 1px solid green;
+            background-color: red;
             > input {
               width: 100%;
-              padding: 0 10px;
+              padding: 1px 10px;
               font-size: 16px;
               font-family: inherit;
               font-weight: inherit;
               line-height: 50px;
               border: none;
               outline: none;
-              background-color: green;
+              background-color: transparent;
             }
           }
         }

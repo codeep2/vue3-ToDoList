@@ -36,6 +36,7 @@ interface DayItem {
   year: number;
   month: number;
   day: number;
+  week: number;
   iscurrent: boolean;
   istoday: boolean;
   lunar: unknown [];
@@ -80,8 +81,9 @@ export default defineComponent({
           day === now.getDate() &&
           month === now.getMonth() &&
           year === now.getFullYear()
+        const week = i % 7
 
-        days.push(Object.assign(dayItem, { year, day, istoday }))
+        days.push(Object.assign(dayItem, { year, day, week, istoday }))
       }
       return days
     })
@@ -130,9 +132,11 @@ export default defineComponent({
   methods: {
     jumpTodo (i: number, j: number) {
       const dayItem = this.getCalendarDay[(i - 1) * 7 + (j - 1)]
-      let strday = dayItem.day.toString()
-      if (strday.length === 1) { strday = '0' + strday }
-      const strDate = dayItem.year.toString() + dayItem.month + strday
+      let strMonth = dayItem.month.toString()
+      let strDay = dayItem.day.toString()
+      if (strDay.length === 1) { strDay = '0' + strDay }
+      if (strMonth.length === 1) { strMonth = '0' + strMonth }
+      const strDate = dayItem.year.toString() + strMonth + strDay
       this.$router.push({ name: 'todolist', params: { date: strDate } })
     }
   }
@@ -200,6 +204,7 @@ export default defineComponent({
               }
               .lunar {
                 width: fit-content;
+                margin-top: -2px;
                 white-space: nowrap;
                 color: #6d4f44;
               }
