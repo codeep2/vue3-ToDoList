@@ -2,17 +2,32 @@
 div.todolist__card
   div.todolist__card-header
     TheHeader(:headerTitle="title")
-      SvgIcon(iconName="ellipsis")
+      SvgIcon(iconName="ellipsis" @click="addtodo")
   div.todolist__card-body
     ul.todos
-      template(v-for="todo in todos")
+      template(v-for="todo in todos[title]")
         li.todo
-          label(v-show="false")
-          input
+          label(
+            for="todo"
+            @click="editToDo(todo)"
+            v-show="!todo.isinput"
+          ) {{ todo.content }}
+          input(
+            id="todo"
+            type="text"
+            placeholder="Input Something"
+            v-show="todo.isinput"
+            v-model="todo.content"
+            v-focus
+            @blur="editDone(todo)"
+            @keyup.enter="editDone(todo)"
+          )
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, computed, watch, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useStore } from 'vuex'
 import TheHeader from '@/components/TheHeader.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 
@@ -28,13 +43,64 @@ export default defineComponent({
       type: String
     }
   },
-  data () {
+  directives: {
+    focus: {
+      mounted (el) {
+        el.focus()
+      }
+    }
+  },
+  setup (props) {
+    const route = useRoute()
+    const store = useStore()
+    const date = route.params.date as string
+    const todos = computed(() => store.state.todos)
+    const title = props.title as string
+
+    const addtodo = () => {
+      if (!todos.value[title]) {
+        store.commit('save', {
+          STORAGE_KEY: date,
+          title: title,
+          todo: [{
+            content: '',
+            isinput: true
+          }]
+        })
+      } else {
+        todos.value[title].push({
+          content: '',
+          isinput: true
+        })
+      }
+    }
+
+    const editToDo = (todo: { isinput: boolean }) => {
+      todo.isinput = true
+    }
+
+    const editDone = (todo: { content: string; isinput: boolean }) => {
+      if (!todo.content) {
+        todos.value[title].pop()
+      } else {
+        todo.isinput = false
+      }
+    }
+
+    watch(todos, (todos) => {
+      todos.STORAGE_KEY = date
+      store.commit('save', todos)
+    }, { deep: true })
+
+    onMounted(() => {
+      store.commit('fetch', { STORAGE_KEY: date })
+    })
+
     return {
-      todos: [
-        { content: 123 },
-        { content: 456 },
-        { content: 789 }
-      ]
+      todos,
+      addtodo,
+      editToDo,
+      editDone
     }
   }
 })
@@ -66,14 +132,21 @@ export default defineComponent({
             padding: 0 10px;
             border-radius: 14px;
             border: 1px solid green;
-            background-color: red;
+            // background-color: red;
+            > label {
+              display: block;
+              width: 100%;
+              line-height: 50px;
+              font-size: 16px;
+              cursor: pointer;
+            }
             > input {
               width: 100%;
-              padding: 1px 10px;
               font-size: 16px;
               font-family: inherit;
               font-weight: inherit;
               line-height: 50px;
+              padding: 0;
               border: none;
               outline: none;
               background-color: transparent;
