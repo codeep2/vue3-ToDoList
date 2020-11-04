@@ -8,12 +8,10 @@ div.todolist__card
       template(v-for="todo in todos[title]")
         li.todo
           label(
-            for="todo"
             @click="editToDo(todo)"
             v-show="!todo.isinput"
           ) {{ todo.content }}
           input(
-            id="todo"
             type="text"
             placeholder="Input Something"
             v-show="todo.isinput"
@@ -87,9 +85,12 @@ export default defineComponent({
       }
     }
 
-    watch(todos, (todos) => {
-      todos.STORAGE_KEY = date
-      store.commit('save', todos)
+    watch(todos, (newtodo) => {
+      store.commit('save', {
+        STORAGE_KEY: date,
+        title: title,
+        todo: newtodo[title]
+      })
     }, { deep: true })
 
     onMounted(() => {
@@ -139,6 +140,8 @@ export default defineComponent({
               line-height: 50px;
               font-size: 16px;
               cursor: pointer;
+              white-space: nowrap;
+              overflow: hidden;
             }
             > input {
               width: 100%;
