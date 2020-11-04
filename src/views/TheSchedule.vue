@@ -15,16 +15,22 @@ div.schedule
           td(
             :class="tdStyle(i, j)"
             @dblclick="jumpTodo(i, j)"
+            @click="conso(i, j)"
           )
             div.calendar_day
               div.day
                 span.gregorian {{ getCalendarDay[(i - 1) * 7 + (j - 1)].day }}
                 span.lunar {{ getLunar(i, j) }}
+              div.todo_item
+                template(v-for="(todo, index) in getToDoItem(i, j)")
+                  div.do_item(v-if="index === 0 && todo.content") {{ todo.content }}
+                  div.done_item(v-if="index === 1") {{ todo.content }}
 </template>
 
 <script lang="ts">
 import Lunar from '@/utils/lunar'
 import { defineComponent, reactive, computed } from 'vue'
+import { useStore } from 'vuex'
 
 interface Date {
   year: number;
@@ -40,16 +46,36 @@ interface DayItem {
   iscurrent: boolean;
   istoday: boolean;
   lunar: unknown [];
+  todo: {
+    DO: string;
+    DONE: string;
+    STORAGE_KEY: string;
+  };
 }
 
 export default defineComponent({
   setup () {
+    const store = useStore()
     const date = new Date()
+    const todos = computed(() => store.state.todos)
     const currentDay = reactive({
       year: date.getFullYear(),
       month: date.getMonth(),
       day: date.getDate()
     }) as Date
+
+    const setToDo = (year: number, month: number | string, day: number | string) => {
+      if (month < 10) {
+        month = '0' + month
+      }
+      if (day < 10) {
+        day = '0' + day
+      }
+      const dayItem: string = (year.toString()).concat(month.toString(), day.toString())
+      store.commit('fetch', { STORAGE_KEY: dayItem })
+
+      return todos?.value || {}
+    }
 
     const getCalendarDay = computed(() => {
       // 先得出这个月1号是周几（firstDaysWeek）
@@ -58,9 +84,10 @@ export default defineComponent({
       const firstDaysWeek = new Date(year, month, 1).getDay() || 7
       const now = new Date()
       const days: DayItem[] = []
+      const maxDay = new Date(year, month + 1, 0).getDate()
+
       for (let i = 0; i < 42; i++) {
         // 当月天数
-        const maxDay = new Date(year, month + 1, 0).getDate()
         const dayItem = {} as DayItem
 
         const day = new Date(year, month, -firstDaysWeek + i + 2).getDate()
@@ -82,8 +109,9 @@ export default defineComponent({
           month === now.getMonth() &&
           year === now.getFullYear()
         const week = i % 7
+        const todo = setToDo(year, dayItem.month, day)
 
-        days.push(Object.assign(dayItem, { year, day, week, istoday }))
+        days.push(Object.assign(dayItem, { year, day, week, istoday, todo }))
       }
       return days
     })
@@ -113,12 +141,31 @@ export default defineComponent({
       }
     }
 
+    const getToDoItem = (i: number, j: number) => {
+      const dayItem = getCalendarDay.value[(i - 1) * 7 + (j - 1)]
+      const todos = []
+      const doContent = dayItem?.todo?.DO?.[0]
+      const doneContent = dayItem?.todo?.DONE?.[0]
+
+      if (doContent) {
+        todos.push(doContent)
+      }
+      if (doneContent) {
+        if (!doContent) {
+          todos.push({})
+        }
+        todos.push(doneContent)
+      }
+      return todos
+    }
+
     return {
-      date,
       currentDay,
       tdStyle,
+      setToDo,
       getLunar,
       switchMonth,
+      getToDoItem,
       getCalendarDay
     }
   },
@@ -138,6 +185,17 @@ export default defineComponent({
       if (strMonth.length === 1) { strMonth = '0' + strMonth }
       const strDate = dayItem.year.toString() + strMonth + strDay
       this.$router.push({ name: 'todolist', params: { date: strDate } })
+    },
+    isHaveToDo (i: number, j: number) {
+      const dayItem = this.getCalendarDay[(i - 1) * 7 + (j - 1)]
+      if (dayItem.todo) {
+        return true
+      }
+      return false
+    },
+    conso (i: number, j: number) {
+      const dayItem = this.getCalendarDay[(i - 1) * 7 + (j - 1)]
+      console.log(dayItem.todo)
     }
   }
 })
@@ -191,6 +249,7 @@ export default defineComponent({
           }
         }
         td {
+          width: 160px;
           border-right: 1px solid #878787;
           border-bottom: 1px solid #878787;
           .calendar_day {
@@ -209,6 +268,23 @@ export default defineComponent({
                 color: #6d4f44;
               }
             }
+            .todo_item {
+              font-size: 15px;
+              .do_item, .done_item {
+                height: 21px;
+                color: #fbf7f5;
+                overflow: hidden;
+                cursor: pointer;
+                border-radius: 4px;
+              }
+              .do_item {
+                margin: 5px 0;
+                background-color: #ce483ebd;
+              }
+              .done_item {
+                background-color: #2f9a7a9e;
+              }
+            }
           }
           &:first-child {
             border-left: 1px solid #878787;
@@ -219,6 +295,7 @@ export default defineComponent({
         }
         td.today {
           color: #52b159;
+          background: #5f907f6b;
         }
         td.notcurrent {
           color: #c0c4cc;
